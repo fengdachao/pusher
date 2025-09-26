@@ -13,6 +13,9 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { CrawlerModule } from './crawler/crawler.module';
 import { DatabaseModule } from './database/database.module';
+import { SearchModule } from './search/search.module';
+import { NlpModule } from './nlp/nlp.module';
+import { RankingModule } from './ranking/ranking.module';
 
 @Module({
   imports: [
@@ -41,6 +44,9 @@ import { DatabaseModule } from './database/database.module';
     SubscriptionsModule,
     NotificationsModule,
     CrawlerModule,
+    SearchModule,
+    NlpModule,
+    RankingModule,
   ],
 })
 export class AppModule {}
