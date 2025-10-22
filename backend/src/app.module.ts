@@ -27,12 +27,14 @@ import { RankingModule } from './ranking/ranking.module';
     
     CacheModule.registerAsync({
       isGlobal: true,
-      useFactory: () => ({
-        store: redisStore as any,
-        host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379'),
-        ttl: 300, // 5 minutes default TTL
-      }),
+      useFactory: () => {
+        const redisUrl = process.env.REDIS_URL || 'redis://redis:6379';
+        return {
+          store: redisStore as any,
+          url: redisUrl,
+          ttl: 300, // 5 minutes default TTL
+        };
+      },
     }),
     
     ScheduleModule.forRoot(),

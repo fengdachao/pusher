@@ -35,12 +35,14 @@ exports.AppModule = AppModule = __decorate([
             database_module_1.DatabaseModule,
             cache_manager_1.CacheModule.registerAsync({
                 isGlobal: true,
-                useFactory: () => ({
-                    store: cache_manager_redis_store_1.redisStore,
-                    host: process.env.REDIS_HOST || 'localhost',
-                    port: parseInt(process.env.REDIS_PORT || '6379'),
-                    ttl: 300,
-                }),
+                useFactory: () => {
+                    const redisUrl = process.env.REDIS_URL || 'redis://redis:6379';
+                    return {
+                        store: cache_manager_redis_store_1.redisStore,
+                        url: redisUrl,
+                        ttl: 300,
+                    };
+                },
             }),
             schedule_1.ScheduleModule.forRoot(),
             auth_module_1.AuthModule,

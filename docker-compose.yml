@@ -52,6 +52,8 @@ services:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://postgres:password@postgres:5432/news_subscription
       - REDIS_URL=redis://redis:6379
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
       - OPENSEARCH_URL=http://opensearch:9200
       - JWT_SECRET=your-super-secret-jwt-key
     depends_on:
