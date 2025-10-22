@@ -10,6 +10,7 @@ import { RankingService } from '../ranking/ranking.service';
 import { EmailService, DigestArticle } from './email.service';
 import { WebPushService } from './webpush.service';
 import { Device } from '../users/device.entity';
+import { DevicePlatform } from '../users/device.entity';
 
 @Injectable()
 export class DigestService {
@@ -193,7 +194,7 @@ export class DigestService {
     const devices = await this.deviceRepository.find({
       where: { 
         userId,
-        platform: 'web',
+        platform: DevicePlatform.WEB,
       },
     });
 
@@ -288,7 +289,7 @@ export class DigestService {
     article: DigestArticle
   ): Promise<void> {
     const devices = await this.deviceRepository.find({
-      where: { userId, platform: 'web' },
+      where: { userId, platform: DevicePlatform.WEB },
     });
 
     for (const device of devices) {

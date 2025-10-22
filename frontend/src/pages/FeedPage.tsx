@@ -7,7 +7,6 @@ import {
   Clock, 
   User, 
   Bookmark, 
-  BookmarkCheck,
   ThumbsUp,
   ThumbsDown,
   Filter,
@@ -398,10 +397,13 @@ const FeedPage: React.FC = () => {
 
   const { data: searchData, isLoading: searchLoading, error: searchError } = useQuery(
     ['search', searchQuery, filters],
-    () => feedAPI.search(searchQuery, {
-      ...filters,
-      sort: searchQuery ? 'relevance' : filters.sort
-    }),
+    () => {
+      const sort = searchQuery ? 'relevance' : (filters.sort === 'trend' ? 'popularity' : (filters.sort === 'personal' ? 'recency' : filters.sort));
+      return feedAPI.search(searchQuery, {
+        ...filters,
+        sort: sort as 'relevance' | 'recency' | 'popularity' | undefined,
+      });
+    },
     { 
       enabled: !!searchQuery.trim(),
       staleTime: 2 * 60 * 1000, // 2 minutes
@@ -446,8 +448,13 @@ const FeedPage: React.FC = () => {
   useEffect(() => {
     if (user) {
       feedAPI.getBookmarks().then(bookmarks => {
-        setBookmarkedArticles(new Set(bookmarks.map(b => b.articleId)));
-      }).catch(console.error);
+        setBookmarkedArticles(new Set(bookmarks.items.map(b => b.articleId)));
+      }).catch(err => {
+        // Bookmarks feature not implemented yet, silently ignore
+        if (err?.response?.status !== 404) {
+          console.error('Failed to load bookmarks:', err);
+        }
+      });
     }
   }, [user]);
 
@@ -691,11 +698,11 @@ const FeedPage: React.FC = () => {
           <ResultsInfo>
             <span>
               {searchQuery.trim() ? (
-                <>找到 {currentData.totalHits || currentData.total} 条相关结果</>
+                <>找到 {(currentData as any).totalHits || currentData.total} 条相关结果</>
               ) : (
                 <>共 {currentData.total} 条资讯</>
               )}
-              {currentData.tookMs && <> · 耗时 {currentData.tookMs}ms</>}
+              {(currentData as any).tookMs && <> · 耗时 {(currentData as any).tookMs}ms</>}
             </span>
             {currentData.items?.length > 0 && (
               <span>第 {page} 页</span>
@@ -737,7 +744,7 @@ const FeedPage: React.FC = () => {
               <ArticleMeta>
                 <MetaItem>
                   <User />
-                  {article.source?.name || article.sourceName}
+                  {article.sourceName}
                 </MetaItem>
                 <MetaItem>
                   <Clock />
@@ -759,9 +766,9 @@ const FeedPage: React.FC = () => {
                 <TopicTags>
                   {article.topics?.map(topic => (
                     <TopicTag 
-                      key={typeof topic === 'string' ? topic : topic.code}
+                      key={topic}
                     >
-                      {typeof topic === 'string' ? topic : topic.name}
+                      {topic}
                     </TopicTag>
                   ))}
                 </TopicTags>
@@ -788,7 +795,7 @@ const FeedPage: React.FC = () => {
                     onClick={(e) => handleBookmark(article.id, e)}
                     title="收藏"
                   >
-                    {bookmarkedArticles.has(article.id) ? <BookmarkCheck /> : <Bookmark />}
+                    {bookmarkedArticles.has(article.id) ? <Bookmark /> : <Bookmark />}
                   </ActionButton>
                   
                   <ActionButton

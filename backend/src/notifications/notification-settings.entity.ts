@@ -27,6 +27,12 @@ export class NotificationSettings {
   @Column({ name: 'max_items_per_digest', default: 20 })
   maxItemsPerDigest: number;
 
+  @Column({ name: 'mute_start', type: 'time', nullable: true })
+  muteStart?: string;
+
+  @Column({ name: 'mute_end', type: 'time', nullable: true })
+  muteEnd?: string;
+
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 

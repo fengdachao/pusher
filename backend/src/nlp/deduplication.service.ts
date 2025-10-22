@@ -156,7 +156,7 @@ export class DeduplicationService {
 
       // Create new cluster if no similar cluster found
       const newCluster = this.clusterRepository.create({
-        simhash,
+        simhash: simhash.toString(),
         representativeArticleId: article.id,
       });
 
