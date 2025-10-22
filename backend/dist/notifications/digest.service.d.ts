@@ -1,0 +1,35 @@
+import { Repository } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
+import { User } from '../users/user.entity';
+import { NotificationSettings } from './notification-settings.entity';
+import { ArticlesService } from '../articles/articles.service';
+import { RankingService } from '../ranking/ranking.service';
+import { EmailService } from './email.service';
+import { WebPushService } from './webpush.service';
+import { Device } from '../users/device.entity';
+export declare class DigestService {
+    private userRepository;
+    private settingsRepository;
+    private deviceRepository;
+    private articlesService;
+    private rankingService;
+    private emailService;
+    private webPushService;
+    private configService;
+    private readonly logger;
+    constructor(userRepository: Repository<User>, settingsRepository: Repository<NotificationSettings>, deviceRepository: Repository<Device>, articlesService: ArticlesService, rankingService: RankingService, emailService: EmailService, webPushService: WebPushService, configService: ConfigService);
+    sendMorningDigests(): Promise<void>;
+    sendEveningDigests(): Promise<void>;
+    generateAndSendDigests(digestType: 'morning' | 'evening'): Promise<void>;
+    generateUserDigest(user: User, digestType: 'morning' | 'evening'): Promise<void>;
+    private generatePersonalizedDigest;
+    private sendEmailDigest;
+    private sendWebPushDigest;
+    sendBreakingNews(articleId: string, threshold?: number): Promise<void>;
+    private sendBreakingWebPush;
+    private getUsersForDigest;
+    private isInMutePeriod;
+    private timeStringToMinutes;
+    private getCurrentTimeString;
+    triggerDigest(userId: string, digestType: 'morning' | 'evening' | 'manual'): Promise<void>;
+}

@@ -41,30 +41,41 @@ export interface SearchResponse {
 @Injectable()
 export class SearchService implements OnModuleInit {
   private readonly logger = new Logger(SearchService.name);
-  private client: Client;
+  private client: Client | null = null;
   private readonly indexName = 'news_articles';
 
   constructor(private configService: ConfigService) {
     const opensearchUrl = this.configService.get<string>('OPENSEARCH_URL');
-    
-    this.client = new Client({
-      node: opensearchUrl,
-      ssl: {
-        rejectUnauthorized: false,
-      },
-    });
+    if (!opensearchUrl) {
+      this.logger.warn('OPENSEARCH_URL not set. Search features are disabled.');
+      return;
+    }
+    try {
+      this.client = new Client({
+        node: opensearchUrl,
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      });
+    } catch (err) {
+      this.logger.error('Failed to initialize OpenSearch client. Disabling search.', err as any);
+      this.client = null;
+    }
   }
 
   async onModuleInit() {
     try {
-      await this.createIndexIfNotExists();
-      this.logger.log('OpenSearch connection established');
+      if (this.client) {
+        await this.createIndexIfNotExists();
+        this.logger.log('OpenSearch connection established');
+      }
     } catch (error) {
       this.logger.error('Failed to connect to OpenSearch:', error);
     }
   }
 
   private async createIndexIfNotExists() {
+    if (!this.client) return;
     const exists = await this.client.indices.exists({
       index: this.indexName,
     });
@@ -122,6 +133,7 @@ export class SearchService implements OnModuleInit {
 
   async indexArticle(article: any): Promise<void> {
     try {
+      if (!this.client) return;
       await this.client.index({
         index: this.indexName,
         id: article.id,
@@ -147,6 +159,15 @@ export class SearchService implements OnModuleInit {
   }
 
   async search(searchQuery: SearchQuery): Promise<SearchResponse> {
+    if (!this.client) {
+      return {
+        results: [],
+        total: 0,
+        page: searchQuery.page || 1,
+        limit: searchQuery.limit || 20,
+        tookMs: 0,
+      };
+    }
     const { query, filters = {}, sort = 'relevance', page = 1, limit = 20 } = searchQuery;
     
     const must: any[] = [];
@@ -247,6 +268,7 @@ export class SearchService implements OnModuleInit {
 
   async deleteArticle(articleId: string): Promise<void> {
     try {
+      if (!this.client) return;
       await this.client.delete({
         index: this.indexName,
         id: articleId,
@@ -260,6 +282,7 @@ export class SearchService implements OnModuleInit {
 
   async bulkIndex(articles: any[]): Promise<void> {
     if (!articles.length) return;
+    if (!this.client) return;
 
     const body = articles.flatMap(article => [
       { index: { _index: this.indexName, _id: article.id } },

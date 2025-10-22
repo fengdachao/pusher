@@ -265,13 +265,19 @@ const SubscriptionsPage: React.FC = () => {
   const { data: sources } = useQuery('sources', sourcesAPI.getSources);
   const { data: topics } = useQuery('topics', sourcesAPI.getTopics);
 
+  
   const createMutation = useMutation(subscriptionsAPI.createSubscription, {
     onSuccess: () => {
       queryClient.invalidateQueries('subscriptions');
+      // Invalidate feed queries to trigger refetch with new subscription settings
+      queryClient.invalidateQueries('feed');
+      queryClient.invalidateQueries('search');
       setShowModal(false);
-      toast.success('订阅创建成功');
+      toast.success('订阅创建成功！正在为您获取相关内容...');
     },
-    onError: () => toast.error('创建失败'),
+    onError: () => {
+      toast.error('创建失败');
+    },
   });
 
   const updateMutation = useMutation(
@@ -280,19 +286,29 @@ const SubscriptionsPage: React.FC = () => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries('subscriptions');
+        // Invalidate feed queries to trigger refetch with updated subscription settings
+        queryClient.invalidateQueries('feed');
+        queryClient.invalidateQueries('search');
         setShowModal(false);
-        toast.success('订阅更新成功');
+        toast.success('订阅更新成功！正在刷新您的内容...');
       },
-      onError: () => toast.error('更新失败'),
+      onError: () => {
+        toast.error('更新失败');
+      },
     }
   );
 
   const deleteMutation = useMutation(subscriptionsAPI.deleteSubscription, {
     onSuccess: () => {
       queryClient.invalidateQueries('subscriptions');
+      // Invalidate feed queries to trigger refetch after subscription deletion
+      queryClient.invalidateQueries('feed');
+      queryClient.invalidateQueries('search');
       toast.success('订阅删除成功');
     },
-    onError: () => toast.error('删除失败'),
+    onError: () => {
+      toast.error('删除失败');
+    },
   });
 
   const handleAdd = () => {
@@ -333,11 +349,13 @@ const SubscriptionsPage: React.FC = () => {
       dailyLimit: formData.dailyLimit,
     };
 
+    
     if (editingSubscription) {
       updateMutation.mutate({ id: editingSubscription.id, data });
     } else {
       createMutation.mutate(data);
     }
+    
   };
 
   const handleDelete = (id: string) => {
