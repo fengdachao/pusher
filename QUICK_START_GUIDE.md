@@ -18,8 +18,8 @@ git clone <项目地址>
 cd news-subscription-system
 
 # 2. 一键启动
-chmod +x start.sh
-./start.sh
+chmod +x start-unified.sh
+./start-unified.sh
 ```
 
 ### 方式二：手动启动

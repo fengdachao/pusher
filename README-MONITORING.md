@@ -21,7 +21,7 @@
 
 ### 方法一：一键启动（推荐）
 ```bash
-./start-monitoring.sh
+./start-unified.sh
 ```
 
 ### 方法二：手动启动
