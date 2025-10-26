@@ -218,11 +218,35 @@ async crawlAllSources() {
 ## 🛠️ 运维管理
 
 ### 监控指标
-系统内置了以下关键指标：
+
+本项目实现了完整的监控体系：
+
+**监控服务访问：**
+- Prometheus: http://localhost:9090
+- Grafana: http://localhost:3002 (admin/admin)
+
+**API 端点：**
+- 系统健康检查：`GET /api/v1/health`
+- Prometheus 指标：`GET /api/v1/metrics`
+- 爬虫统计：`GET /api/v1/monitoring/crawler-stats`
+- 数据库统计：`GET /api/v1/monitoring/database-stats`
+
+**已实现监控：**
+- ✅ 基础系统监控（CPU、内存、HTTP请求）
+- ✅ 爬虫监控（运行状态、成功率、文章数、错误统计）
+- ✅ 数据库监控（连接数、查询性能）
+- ✅ Grafana 可视化仪表板（2个专业仪表板）
+
+**业务指标：**
 - 新闻采集成功率
 - 去重率和覆盖率  
 - 用户活跃度和留存率
 - 推送送达率和打开率
+
+**详细文档：**
+- 📖 [监控系统完整文档](README-MONITORING.md)
+- 📊 [监控进度与计划](MONITORING_PROGRESS.md)
+- ⚡ [监控快速参考](MONITORING_QUICK_REFERENCE.md)
 
 ### 日志管理
 - 应用日志：`/app/logs/`
