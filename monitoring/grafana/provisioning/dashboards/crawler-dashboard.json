@@ -1,0 +1,283 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "crawler-monitoring",
+    "title": "爬虫监控仪表板",
+    "tags": ["crawler", "monitoring"],
+    "style": "dark",
+    "timezone": "browser",
+    "editable": true,
+    "graphTooltip": 1,
+    "panels": [
+      {
+        "id": 1,
+        "title": "爬虫运行状态",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "crawler_active_sources",
+            "legendFormat": "活跃源数量"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 1},
+                {"color": "green", "value": 3}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 6, "w": 4, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "爬取成功率（最近1小时）",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "sum(rate(crawler_runs_total{status=\"success\"}[1h])) / sum(rate(crawler_runs_total[1h])) * 100",
+            "legendFormat": "成功率"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 80},
+                {"color": "green", "value": 95}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 6, "w": 4, "x": 4, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "总爬取文章数（最近24小时）",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(crawler_articles_scraped_total[24h]))",
+            "legendFormat": "文章总数"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 50},
+                {"color": "green", "value": 100}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 6, "w": 4, "x": 8, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "错误总数（最近24小时）",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(crawler_errors_total[24h]))",
+            "legendFormat": "错误数"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 5},
+                {"color": "red", "value": 20}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 6, "w": 4, "x": 12, "y": 0}
+      },
+      {
+        "id": 5,
+        "title": "每个源的爬取成功率",
+        "type": "bargauge",
+        "targets": [
+          {
+            "expr": "sum by (source) (rate(crawler_runs_total{status=\"success\"}[1h])) / sum by (source) (rate(crawler_runs_total[1h])) * 100",
+            "legendFormat": "{{source}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 80},
+                {"color": "green", "value": 95}
+              ]
+            }
+          }
+        },
+        "options": {
+          "orientation": "horizontal",
+          "displayMode": "gradient"
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 6}
+      },
+      {
+        "id": 6,
+        "title": "爬取速率（请求/分钟）",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum by (source) (rate(crawler_runs_total[5m])) * 60",
+            "legendFormat": "{{source}}"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "请求/分钟",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 6}
+      },
+      {
+        "id": 7,
+        "title": "爬取耗时分布（P50, P95, P99）",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum by (source, le) (rate(crawler_duration_seconds_bucket[5m])))",
+            "legendFormat": "{{source}} P50"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum by (source, le) (rate(crawler_duration_seconds_bucket[5m])))",
+            "legendFormat": "{{source}} P95"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum by (source, le) (rate(crawler_duration_seconds_bucket[5m])))",
+            "legendFormat": "{{source}} P99"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "秒",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 16, "x": 0, "y": 14}
+      },
+      {
+        "id": 8,
+        "title": "每次爬取文章数分布",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum by (source, le) (rate(crawler_articles_per_run_bucket[5m])))",
+            "legendFormat": "{{source}} P50"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum by (source, le) (rate(crawler_articles_per_run_bucket[5m])))",
+            "legendFormat": "{{source}} P95"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "文章数",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 16, "x": 0, "y": 22}
+      },
+      {
+        "id": 9,
+        "title": "错误类型分布（最近24小时）",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (error_type) (increase(crawler_errors_total[24h]))",
+            "legendFormat": "{{error_type}}"
+          }
+        ],
+        "options": {
+          "legend": {
+            "displayMode": "table",
+            "placement": "right"
+          },
+          "pieType": "pie"
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 14}
+      },
+      {
+        "id": 10,
+        "title": "最后爬取时间",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "crawler_last_run_timestamp",
+            "format": "table",
+            "instant": true
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {
+                "__name__": true,
+                "instance": true,
+                "job": true
+              },
+              "renameByName": {
+                "source": "新闻源",
+                "Value": "最后运行时间"
+              }
+            }
+          }
+        ],
+        "fieldConfig": {
+          "overrides": [
+            {
+              "matcher": {"id": "byName", "options": "最后运行时间"},
+              "properties": [
+                {
+                  "id": "unit",
+                  "value": "dateTimeFromNow"
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 22}
+      }
+    ],
+    "time": {
+      "from": "now-24h",
+      "to": "now"
+    },
+    "refresh": "30s"
+  }
+}

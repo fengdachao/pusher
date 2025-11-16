@@ -4,7 +4,7 @@
 
 ### 方式一：一键启动（推荐）
 ```bash
-./start.sh
+./start-unified.sh
 ```
 
 ### 方式二：手动启动

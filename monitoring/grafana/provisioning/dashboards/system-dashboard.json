@@ -1,0 +1,139 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "新闻订阅系统监控",
+    "tags": ["news", "monitoring"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "系统健康状态",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"nestjs-app\"}",
+            "legendFormat": "应用状态"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "HTTP 请求速率",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total[5m])",
+            "legendFormat": "{{method}} {{route}}"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "请求/秒",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 6, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "HTTP 响应时间",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "95th percentile"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "50th percentile"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "秒",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 18, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "内存使用情况",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "nodejs_heap_size_total_bytes",
+            "legendFormat": "堆内存总量"
+          },
+          {
+            "expr": "nodejs_heap_size_used_bytes",
+            "legendFormat": "堆内存使用"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "字节",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 5,
+        "title": "活跃连接数",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "active_connections",
+            "legendFormat": "活跃连接"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "连接数",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "id": 6,
+        "title": "数据库连接",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "database_connections_active",
+            "legendFormat": "数据库连接"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "连接数",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 24, "y": 8}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s"
+  }
+}
