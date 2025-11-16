@@ -1,0 +1,29 @@
+# pusher Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2025-11-13
+
+## Active Technologies
+
+- TypeScript 5.1.3, React 18.2.0 + styled-components 6.0.5, react-router-dom 6.4.3, lucide-react 0.263.1 (001-ui-enhancement)
+
+## Project Structure
+
+```text
+src/
+tests/
+```
+
+## Commands
+
+npm test && npm run lint
+
+## Code Style
+
+TypeScript 5.1.3, React 18.2.0: Follow standard conventions
+
+## Recent Changes
+
+- 001-ui-enhancement: Added TypeScript 5.1.3, React 18.2.0 + styled-components 6.0.5, react-router-dom 6.4.3, lucide-react 0.263.1
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->
